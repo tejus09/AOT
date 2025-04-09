@@ -1,6 +1,6 @@
 # Path configuration
-INPUT_DIR = "/home/tejus09/Desktop/PersonAttr/unpadded_data"
-OUTPUT_DIR = "/home/tejus09/Desktop/PersonAttr/verified_data"
+INPUT_DIR = "/home/tejus09/Desktop/PersonAttr/VehicleAttributeSplit/batch1"
+OUTPUT_DIR = "/home/tejus09/Desktop/PersonAttr/VehicleAttributeSplit/batch1_ver"
 
 # Create output directory if it doesn't exist
 import os
@@ -20,7 +20,7 @@ VEHICLE_COLORS = ["Khakhi", "Silver", "Yellow", "Pink", "Purple", "Green", "Blue
 
 VEHICLE_ORIENTATIONS = ["Front", "Back", "Side", "None of the above"]
 
-VEHICLE_LABELS = ["Bus", "Car", "Truck", "Motorbike", "Bicycle", "E-Rikshaw", 
+VEHICLE_LABELS = ["Bus", "Car", "Truck", "Motorbike", "Bicycle", "E-Rikshaw", "Rikshaw", 
                  "Cycle_Rikshaw", "Tractor", "Cement_Mixer", "Mini_Truck", 
                  "Mini_Bus", "Mini_Van", "Van", "None of the above"]
 

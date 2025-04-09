@@ -75,6 +75,27 @@ def load_current_sample() -> Tuple[Optional[Image.Image], Dict, str]:
             if attr not in current_data:
                 current_data[attr] = default_value
                 modified = True  # Mark as modified since we added defaults
+        
+        # Ensure we have essential metadata
+        if "img_name" not in current_data:
+            current_data["img_name"] = os.path.basename(image_path)
+            modified = True
+            
+        # Try to get image dimensions if they're missing
+        if ("width" not in current_data or "height" not in current_data or 
+            current_data["width"] == 0 or current_data["height"] == 0):
+            try:
+                if os.path.exists(image_path):
+                    with Image.open(image_path) as img:
+                        current_data["width"], current_data["height"] = img.size
+                        modified = True
+            except Exception:
+                # If we can't get dimensions, use placeholders
+                if "width" not in current_data:
+                    current_data["width"] = 0
+                if "height" not in current_data:
+                    current_data["height"] = 0
+                modified = True
             
         issues = validate_json_structure(current_data)
         

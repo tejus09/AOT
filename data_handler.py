@@ -8,13 +8,73 @@ from config import INPUT_DIR, OUTPUT_DIR, PROGRESS_FILE
 def get_all_samples() -> List[str]:
     """Get all JSON files from input directory"""
     json_files = glob.glob(os.path.join(INPUT_DIR, "*.json"))
+    
+    # Also check for images without JSON files
+    image_files = glob.glob(os.path.join(INPUT_DIR, "*.jpg")) + glob.glob(os.path.join(INPUT_DIR, "*.jpeg")) + glob.glob(os.path.join(INPUT_DIR, "*.png"))
+    
+    # Create dummy JSON files for images without corresponding JSON
+    for img_path in image_files:
+        base_name = os.path.basename(img_path)
+        img_name = os.path.splitext(base_name)[0]
+        json_path = os.path.join(INPUT_DIR, f"{img_name}.json")
+        
+        if json_path not in json_files and not os.path.exists(json_path):
+            # Create a dummy JSON file with default values
+            create_dummy_json(img_path, json_path)
+            json_files.append(json_path)
+    
     return sorted(json_files)
+
+def create_dummy_json(img_path: str, json_path: str) -> None:
+    """Create a dummy JSON file with default values for an image
+    
+    Args:
+        img_path: Path to the image file
+        json_path: Path where the JSON file should be created
+    """
+    try:
+        # Get image dimensions if possible
+        from PIL import Image
+        try:
+            with Image.open(img_path) as img:
+                width, height = img.size
+        except Exception:
+            # If we can't open the image, use placeholder values
+            width, height = 0, 0
+            
+        # Create dummy data with default values
+        dummy_data = {
+            "img_name": os.path.basename(img_path),
+            "width": width,
+            "height": height,
+            "label": "None of the above",
+            "orientation": "None of the above",
+            "brand_name": "None of the above",
+            "vehicle_color": "None of the above",
+            "itype": "None of the above",
+            "type": "None of the above",
+            "special_type": "None of the above"
+        }
+        
+        # Save the dummy JSON file
+        save_json_data(dummy_data, json_path)
+        print(f"Created dummy JSON for {os.path.basename(img_path)}")
+    except Exception as e:
+        print(f"Error creating dummy JSON for {os.path.basename(img_path)}: {str(e)}")
 
 def get_image_path(json_path: str) -> str:
     """Get the corresponding image path for a JSON file"""
     base_name = os.path.basename(json_path)
-    image_name = os.path.splitext(base_name)[0] + ".jpg"
-    return os.path.join(INPUT_DIR, image_name)
+    img_name = os.path.splitext(base_name)[0]
+    
+    # Try different image extensions
+    for ext in ['.jpg', '.jpeg', '.png']:
+        img_path = os.path.join(INPUT_DIR, img_name + ext)
+        if os.path.exists(img_path):
+            return img_path
+            
+    # Default to jpg if no image is found
+    return os.path.join(INPUT_DIR, img_name + ".jpg")
 
 def load_json_data(json_path: str) -> Dict:
     """Load JSON data from file"""
